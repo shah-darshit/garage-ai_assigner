@@ -2,9 +2,7 @@ import sqlite3
 import os
 from datetime import datetime
 
-# --- Configuration & Data Dictionaries ---
-# In a real application, this data might be loaded from a central config file or database
-# For the POC, we define it here so this script can run independently for testing.
+
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DB_PATH = os.path.join(BASE_DIR, 'database/workshop.db')
 
@@ -30,6 +28,7 @@ TASKS_DATA = {
     'T019': {'name': 'Comprehensive Diagnostic Check', 'time': 120},
     'T020': {'name': 'Underbody Inspection', 'time': 60}
 }
+
 BASIC_SERVICE_TASKS = ['T001', 'T002', 'T003', 'T004', 'T005', 'T006']
 INTERMEDIATE_SERVICE_TASKS = BASIC_SERVICE_TASKS + ['T007', 'T008', 'T009', 'T010', 'T011', 'T012']
 FULL_SERVICE_TASKS = INTERMEDIATE_SERVICE_TASKS + ['T013', 'T014', 'T015', 'T016', 'T017', 'T018', 'T019', 'T020']
@@ -93,12 +92,12 @@ if __name__ == '__main__':
     print("--- Simulating UI Input for a 'Basic Service' Job ---")
     
     # The UI collects this data from the manager
-    ui_job_name = "Basic Service"
-    ui_vin = "UI-TEST-VIN-123"
-    ui_make = "Honda"
-    ui_model = "Civic"
-    ui_mileage = 150000
-    ui_urgency = "High"
+    ui_job_name = "Intermediate Service"
+    ui_vin = "UI-67890123456789"
+    ui_make = "Range Rover"
+    ui_model = "Range Rover Sport"
+    ui_mileage = 900
+    ui_urgency = "Low"
     
     # The UI code calls your function
     success = create_job_from_ui_input(

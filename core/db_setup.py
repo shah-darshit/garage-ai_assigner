@@ -14,16 +14,15 @@ def create_connection(db_file):
         print(f"Error connecting to database: {e}")
     return conn
 
-def create_table(conn, create_table_sql):
+def execute_sql(conn, sql_statement):
     try:
         c = conn.cursor()
-        c.execute(create_table_sql)
+        c.execute(sql_statement)
         conn.commit()
     except sqlite3.Error as e:
-        print(f"Error creating table: {e}")
+        print(f"Error executing SQL: {e}")
 
 def setup_database():
-    # --- This is the new, centralized job_history table schema ---
     sql_create_job_history_table = """
     CREATE TABLE IF NOT EXISTS job_history (
         Job_Id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -37,7 +36,7 @@ def setup_database():
         Make TEXT,
         Model TEXT,
         Mileage INTEGER,
-        Assigned_Engineer_Id TEXT,
+        Engineer_Id TEXT,
         Engineer_Name TEXT,
         Engineer_Level TEXT,
         Time_Started DATETIME,
@@ -50,52 +49,25 @@ def setup_database():
 
     sql_create_job_card_table = """
     CREATE TABLE IF NOT EXISTS job_card (
-        Job_Card_ID INTEGER PRIMARY KEY AUTOINCREMENT,
-        Job_Name TEXT NOT NULL,
-        Task_ID TEXT NOT NULL,
+        Job_Id INTEGER PRIMARY KEY AUTOINCREMENT,
+        Job_Name TEXT,
+        Task_Id TEXT NOT NULL,
         Task_Description TEXT,
+        Status TEXT,
+        Date_Completed DATE,
         Urgency TEXT,
-        VIN TEXT NOT NULL,
+        VIN TEXT,
         Make TEXT,
         Model TEXT,
         Mileage INTEGER,
-        Estimated_Standard_Time INTEGER,
-        Status TEXT DEFAULT 'Pending',
-        Date_Created DATE,
-        Assigned_Engineer_Id TEXT,
+        Engineer_Id TEXT,
+        Engineer_Name TEXT,
+        Engineer_Level TEXT,
         Time_Started DATETIME,
-        Time_Ended DATETIME,
-        Outcome_Score INTEGER
+        Estimated_Standard_Time INTEGER
     );
     """
-
-    sql_create_job_definitions_table = """
-    CREATE TABLE IF NOT EXISTS job_definitions (
-        Parent_job_id TEXT PRIMARY KEY,
-        Job_name TEXT UNIQUE NOT NULL
-    );
-    """
-
-    # --- Defines individual, assignable tasks (e.g., "Oil Change") ---
-    sql_create_task_definitions_table = """
-    CREATE TABLE IF NOT EXISTS task_definitions (
-        Task_id TEXT PRIMARY KEY,
-        Task_Description TEXT UNIQUE NOT NULL,
-        Estimated_time_minutes INTEGER
-    );
-    """
-
-    # --- Maps which tasks belong to which job and in what order ---
-    sql_create_job_task_mapping_table = """
-    CREATE TABLE IF NOT EXISTS job_task_mapping (
-        mapping_id INTEGER PRIMARY KEY AUTOINCREMENT,
-        Parent_job_id TEXT NOT NULL,
-        Task_id TEXT NOT NULL,
-        sequence INTEGER NOT NULL,
-        FOREIGN KEY (Parent_job_id) REFERENCES job_definitions (job_id),
-        FOREIGN KEY (Task_id) REFERENCES task_definitions (task_id)
-    );
-    """
+    
     sql_create_engineer_profiles_table = """
     CREATE TABLE IF NOT EXISTS engineer_profiles (
         Engineer_ID TEXT PRIMARY KEY,
@@ -135,13 +107,14 @@ def setup_database():
     conn = create_connection(DATABASE_NAME)
 
     if conn is not None:
-        print("Creating tables...")
-        create_table(conn, sql_create_job_history_table)
-        create_table(conn, sql_create_job_definitions_table)
-        create_table(conn, sql_create_task_definitions_table)
-        create_table(conn, sql_create_job_task_mapping_table)
-        create_table(conn, sql_create_engineer_profiles_table)
-        create_table(conn, sql_create_job_card_table)
+
+        print("Connecting to database to set up tables...")
+        execute_sql(conn, "DROP TABLE IF EXISTS job_card;")
+        execute_sql(conn, "DROP TABLE IF EXISTS job_task_mapping;")
+        execute_sql(conn, "DROP TABLE IF EXISTS job_definitions;")
+        execute_sql(conn, "DROP TABLE IF EXISTS task_definitions;")
+        execute_sql(conn, sql_create_job_card_table)
+
         conn.close()
         print("Database setup complete.")
     else:

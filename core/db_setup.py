@@ -49,12 +49,12 @@ def setup_database():
 
     sql_create_job_card_table = """
     CREATE TABLE IF NOT EXISTS job_card (
-        Job_Id INTEGER PRIMARY KEY AUTOINCREMENT,
+        Job_Id TEXT,
         Job_Name TEXT,
         Task_Id TEXT NOT NULL,
         Task_Description TEXT,
         Status TEXT,
-        Date_Completed DATE,
+        Date_Created DATE,
         Urgency TEXT,
         VIN TEXT,
         Make TEXT,
@@ -67,7 +67,7 @@ def setup_database():
         Estimated_Standard_Time INTEGER
     );
     """
-    
+
     sql_create_engineer_profiles_table = """
     CREATE TABLE IF NOT EXISTS engineer_profiles (
         Engineer_ID TEXT PRIMARY KEY,

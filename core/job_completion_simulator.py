@@ -14,7 +14,7 @@ def complete_and_archive_task(job_id, outcome_score):
         conn.row_factory = sqlite3.Row
         cursor = conn.cursor()
 
-        cursor.execute("SELECT * FROM job_card WHERE job_card_id = ? AND status = 'Assigned'", (job_id,))
+        cursor.execute("SELECT * FROM job_card WHERE job_id = ? AND status = 'Assigned'", (job_id,))
         task_data = cursor.fetchone()
         
         if not task_data:
